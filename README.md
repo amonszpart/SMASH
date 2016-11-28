@@ -59,3 +59,9 @@ cat run.sh
                 --weight-observed-q 1. \
                 --weight-observed-x 3.16
 ```
+
+---
+
+### SMASH Blender plugin
+Open the user <b>File</b> -> <b>User Preferences</b>, Select the Add-ons tab, press <b>Install from File</b> and select *smash_blender_plugin/physacqPanel.py*.
+If you want it to be enabled on restart, press <b>Save User Settings</b>.
