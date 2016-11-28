@@ -63,5 +63,15 @@ cat run.sh
 ---
 
 ### SMASH Blender plugin
-Open the user <b>File</b> -> <b>User Preferences</b>, Select the Add-ons tab, press <b>Install from File</b> and select *smash_blender_plugin/physacqPanel.py*.
+* Open the user <b>File</b> -> <b>User Preferences</b>,
+* select the <b>Add-ons</b> tab,
+* press <b>Install from File</b> and 
+* select *smash_blender_plugin/physacqPanel.py*.
+
 If you want it to be enabled on restart, press <b>Save User Settings</b>.
+
+---
+
+### TODO
+* Rest of the dataset
+* Initialization code
