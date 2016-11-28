@@ -46,11 +46,12 @@ make -j 8
 wget http://geometry.cs.ucl.ac.uk/projects/2016/smash/paper_docs/smash_data.zip
 unzip smash_data.zip
 cd data/duckElephant
+cat run.sh
 ../../bin/smash --intr intrinsics.txt \
                 --frames 0,101,203 \
                 --init 2dparabolasInit.json \
                 --cub cuboids.json \
-                --img-pattern orig240/color_%05d.png \
+                --img-pattern orig240/color_%05d.jpg \
                 --fps 240 \
                 --show-flags 100000 \
                 --weight-velocity 3.16 \
