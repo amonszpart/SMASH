@@ -131,7 +131,6 @@ add_executable(smash ${PHYS_SRC_LIST} ${PHYS_H_LIST})
 target_link_libraries(smash
     common
     vis
-    ${BUNDLER_LIBRARIES}
     ${GLOG_LIBRARY}
     ${CERES_LIBRARIES}
     -L${OpenCV_DIR}/../../lib/ -lopencv_cudalegacy
@@ -140,4 +139,6 @@ target_link_libraries(smash
     #${SUITESPARSE_LIBRARIES}
     ${VTK_LIBRARIES}
 )
+
+set_target_properties(smash PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../bin)
 

@@ -82,7 +82,8 @@ void addParabolaTerms(
                     #endif
                 } else {
                     //if (cuboids.size() > 1 ) {
-                    std::cerr << "[" << __func__ << "] " << "add --para2d to the calls" << std::endl;
+                    std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] "
+                              << "add --para2d to the calls" << std::endl;
                     throw new std::runtime_error("");
                     //}
                     ceres::CostFunction *costFunction = ParabolaCostFunctor::Create(weights.observedPosWeight, frameId, /* xyz: */ cuboid.getPosition(frameId));

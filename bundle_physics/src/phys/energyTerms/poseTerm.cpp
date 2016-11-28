@@ -34,7 +34,7 @@ void addPoseTerms(
 
     ceres::LocalParameterization *quaternionParameterization = new ceres::QuaternionParameterization();
     size_t termCount(0);
-    LossFunctionWrapper* const poseNormalizer{ new LossFunctionWrapper(new ScaledLoss(poseLoss, 1., ceres::TAKE_OWNERSHIP),ceres::TAKE_OWNERSHIP)};
+    LossFunctionWrapper* const poseNormalizer {new LossFunctionWrapper(new ScaledLoss(poseLoss, 1., ceres::TAKE_OWNERSHIP),ceres::TAKE_OWNERSHIP)};
 
     CuboidsT _cuboids = cuboidsArg; // make local copy
 

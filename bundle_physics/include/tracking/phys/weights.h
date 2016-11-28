@@ -63,12 +63,19 @@ namespace tracking {
     {
         Weights()
             : targetNormalization(10.),
-            observedPosWeight(1.), observedPoseWeight(1.), velocityWeight(0.1), conservationWeight(1.), gravityDownWeight(1.), corWeight(1.), keWeight(1.),
-            sizePriorWeight(1.), repulseWeight(1.),
-            collPointWeight(0.), pointsUvWeight(0.), minMomentumWeight(0.),compactnessWeight(0.),pointHuberParam(0.),compactnessHuberParam(0.),
-            fps(60.), poseIntegralSteps(1),
-            doVis(true), solveFlags(SOLVE_FLAGS::SOLVE), solveStages(0xff), initFlags(INIT_FLAGS::NONE), fixFlags(FIX_FLAGS::FIX_NONE),
-            max_num_iterations(std::numeric_limits<int>::max()), max_solver_time_in_seconds(0.), function_tolerance(1.e-12), parameter_tolerance(1.e-12)
+              observedPosWeight(std::sqrt(10.)),
+              observedPoseWeight(1.),
+              velocityWeight(std::sqrt(10.)),
+              conservationWeight(std::sqrt(10.)),
+              gravityDownWeight(1.), corWeight(1.), keWeight(1.),
+              sizePriorWeight(1.), repulseWeight(1.),
+              collPointWeight(0.), pointsUvWeight(0.), minMomentumWeight(0.), compactnessWeight(0.), pointHuberParam(0.),
+              compactnessHuberParam(0.), fps(240.), poseIntegralSteps(1),
+              doVis(true), solveFlags(SOLVE_FLAGS::SOLVE),
+              solveStages(SOLVE_STAGES::SOLVE_COUPLED | SOLVE_STAGES::SOLVE_FREE_CP),
+              initFlags(INIT_FLAGS::NONE), fixFlags(FIX_FLAGS::FIX_NONE),
+              max_num_iterations(std::numeric_limits<int>::max()), max_solver_time_in_seconds(0.),
+              function_tolerance(1.e-12), parameter_tolerance(1.e-12)
         {}
 
         enum SOLVE_FLAGS {

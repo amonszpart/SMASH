@@ -14,7 +14,10 @@
 
 namespace io {
 static constexpr char kFileSep = '/';
-inline void my_mkdir( std::string path, unsigned mode = 755 ) { mkdir(path.c_str(),mode); }
+inline void my_mkdir( std::string path,
+                      unsigned mode = S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH ) {
+    mkdir(path.c_str(),mode);
+}
 
 /** \brief Retrieves the filename stem from a path separated by \p pathSep and having the extension after '.'. */
 inline std::string getStem(std::string const& path, const char pathSep = kFileSep) {

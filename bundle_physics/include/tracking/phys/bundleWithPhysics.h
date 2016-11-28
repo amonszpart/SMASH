@@ -43,7 +43,7 @@ class BundleWithPhysics {
             BundleWithPhysicsResult      &       out,
             CuboidsT                const&       cuboids,
             GroupedTracks2d         const&       tracks2d,
-            LinRgbsT                const&       rgbs,
+            //LinRgbsT                const&       rgbs,
             FrameIdsT               const&       frameIds,
             Mapper                  const&       mapper,
             Weights                 const&       weights,

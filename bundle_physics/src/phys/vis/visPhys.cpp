@@ -46,32 +46,38 @@ namespace tracking {
         const Scalar sceneScale = 1.;
 //        const CeresScalar *const rotationShared(indexer.getParabolaRotationSharedConst());
 
-        Visualizer <Scalar> vis("Initialization"), v2("Optimized");
-//        vis.addCoordinateSystem(sceneScale);
-//        v2.addCoordinateSystem(sceneScale);
+        std::unique_ptr<Visualizer<Scalar> > vis, v2;
+        if (show.count() > show[5]) {
+            vis = std::unique_ptr<Visualizer<Scalar> >(new Visualizer<Scalar>{"Initialization"});
+            v2  = std::unique_ptr<Visualizer<Scalar> >(new Visualizer<Scalar>{"Optimized"});
+        }
+//        vis->addCoordinateSystem(sceneScale);
+//        v2->addCoordinateSystem(sceneScale);
         for (CuboidId cuboidId = 0; cuboidId != static_cast<CuboidId>(cuboids.size()); ++cuboidId) {
             // input
             const Cuboid &cuboid = cuboids.at(cuboidId);
             const Cuboid &outCuboid = out.cuboids->at(cuboidId);
             if (show[SHOW_IN_CUB] || show[SHOW_IN_CENTROIDS]) {
-                drawCuboidStates2(cuboid, vis, sceneScale, /* color: */ Vector3(0., .3, 0.), cuboidId, frameIds, show[SHOW_IN_CENTROIDS]);
-                drawCuboidStates2(cuboid, v2, sceneScale, /* color: */ Vector3(0., .3, 0.), cuboidId, frameIds, show[SHOW_IN_CENTROIDS]);
+                if (!vis) std::cerr << "show.count: " << show.count() << ", [5]: " << int(show[5])
+                                    << ", [0]: " << int(show[5]) << std::endl;
+                drawCuboidStates2(cuboid, *vis, sceneScale, /* color: */ Vector3(0., .3, 0.), cuboidId, frameIds, show[SHOW_IN_CENTROIDS]);
+                drawCuboidStates2(cuboid, *v2, sceneScale, /* color: */ Vector3(0., .3, 0.), cuboidId, frameIds, show[SHOW_IN_CENTROIDS]);
             }
             CeresScalar const* const mass = indexer.getMassConst(cuboidId);
 
             CeresVector3 invI;
             cuboid.getInverseIFromMass(invI, outCuboid.getMass() );
             std::cout << "mass: " << mass[0] << ", invI " << invI.transpose() << std::endl;
-            if ( std::abs(mass[0]-outCuboid.getMass()) > kSmallDiff )
-            {
-                std::cerr << "mass mismatch!" << mass[0] << " vs. " << outCuboid.getMass() << std::endl;
+            if (std::abs(mass[0]-outCuboid.getMass()) > kSmallDiff) {
+                std::cerr << __FILE__ << ":" << __LINE__ << "] "
+                          << "mass mismatch!" << mass[0] << " vs. " << outCuboid.getMass() << std::endl;
                 throw new ShowPhysOutput_MassMismatchException("");
             }
 
             PoseLoc const* prevPoseLoc(nullptr);
             for (const Cuboid::StatesT::value_type &frameIdAndState : out.cuboids->at(cuboidId).getStates()) {
-                const FrameId frameId  = frameIdAndState.first;
-                const PoseLoc &poseLoc = frameIdAndState.second;
+                FrameId const  frameId  = frameIdAndState.first;
+                PoseLoc const& poseLoc = frameIdAndState.second;
                 if (frameIds && (frameId < frameIds->front() || frameId > frameIds->back()))
                     continue;
 
@@ -79,16 +85,25 @@ namespace tracking {
                 if (prevPoseLoc) {
                     sprintf(name, "cuboid%d_frameId%u", cuboidId, frameId);
 //                    vis.addArrow(sceneScale * prevPoseLoc->getPosition(), sceneScale * poseLoc.getPosition(), Vector3(.8, 0., 0.), name, 0.2);
-                    if (show[SHOW_OUT_CENTROIDS])
-                        v2.addSphere(sceneScale * prevPoseLoc->getPosition(), 0.025, Vector3(.8, 0., 0.), name);
+                    if (show[SHOW_OUT_CENTROIDS]) {
+                        if (!v2) std::cerr << "show.count: " << show.count() << ", [5]: " << int(show[5])
+                                            << ", [0]: " << int(show[5]) << std::endl;
+                        v2->addSphere(sceneScale * prevPoseLoc->getPosition(), 0.025, Vector3(.8f, 0.f, 0.f), name);
+                    }
                 }
                 prevPoseLoc = &poseLoc;
 
                 // pose
                 if (!(frameId % (consts.substeps*4)) /*&& cuboids.at(cuboidId).hasFrame(frameId / consts.substeps)*/) {
                     sprintf(name, "optCuboid%d_time%u", cuboidId, frameId);
-                    if (show[SHOW_OUT_POSES])
-                        drawCuboid(v2, TranslationT(sceneScale * poseLoc.getPosition()) * poseLoc.getPose().toRotationMatrix() * cuboid.getSizeTransform(), Vector3(.3, 0., 0.), name);
+                    if (show[SHOW_OUT_POSES]) {
+                        drawCuboid(*v2,
+                                   TranslationT(sceneScale * poseLoc.getPosition()) *
+                                   poseLoc.getPose().toRotationMatrix() * cuboid.getSizeTransform(),
+                                   Vector3(.3, 0., 0.), name);
+                        if (!v2) std::cerr << "show.count: " << show.count() << ", [5]: " << int(show[5])
+                                           << ", [0]: " << int(show[5]) << std::endl;
+                    }
                 }
 
                 // vel
@@ -119,30 +134,34 @@ namespace tracking {
             MapConstCeresVector3 collPoint(indexer.getCollisionPointConst(collId)); // relative to centroidA
             auto                 posA0 = out.collisions.at(collId).states.first.at(0).getPosition();
             //auto                 posA1 = out.collisions.at(collId).states.second.at(0).getPosition();
-//            vis.addSphere(sceneScale * posA0, 0.01, Vector3(1., 0., .0), "posA0");
-//            vis.addSphere(sceneScale * posA1, 0.01, Vector3(.5, .5, 1.), "posA1");
-            if (out.collisions.at(collId).states.first.size() > 1) {
+//            vis->addSphere(sceneScale * posA0, 0.01, Vector3(1., 0., .0), "posA0");
+//            vis->addSphere(sceneScale * posA1, 0.01, Vector3(.5, .5, 1.), "posA1");
+//            if (out.collisions.at(collId).states.first.size() > 1) {
                 //auto posB0 = out.collisions.at(collId).states.first.at(1).getPosition();
 //                vis.addSphere(sceneScale * posB0, 0.01, Vector3(0., .0, 1.), "posB0");
                 //auto posB1 = out.collisions.at(collId).states.second.at(1).getPosition();
 //                vis.addSphere(sceneScale * posB1, 0.01, Vector3(1., .5, .5), "posB1");
-            }
+//            }
 
             if (show[SHOW_COLL_NORMAL]) {
                 auto const startPnt = sceneScale * (posA0 + collPoint.cast<Scalar>());
-                vis.addSphere(startPnt, 0.01, Vector3(.8, .8, .5), "collPoint");
-                vis.addArrow(startPnt, startPnt + out.collisions.at(0).impulse * 2., Vector3::Zero(), "impulse");
+                if (!vis)
+                    std::cerr << "show.count: " << show.count() << ", [5]: " << int(show[5])
+                        << ", [0]: " << int(show[5]) << std::endl;
+                vis->addSphere(startPnt, 0.01, Vector3(.8, .8, .5), "collPoint");
+                vis->addArrow(startPnt, startPnt + out.collisions.at(0).impulse * 2., Vector3::Zero(), "impulse");
                 std::cout << "impulse: " << out.collisions.at(0).impulse.transpose() << std::endl;
                 std::cout << "collPoint: " << collPoint.transpose() << std::endl;
             }
         } //...for collisions
-        vis.spin();
+        if (vis)
+            vis->spin();
     } //...showPhysOutput()
 
     void createMovie( CuboidsT const& cuboids, tracking::LinRgbsT const& rgbs, const FrameIdsT& frameIds, const Mapper& mapper, const CuboidsT* const inCuboids,
                       Tracks3D const* const tracks3d, const Tracks2D* const tracks2d, Vector3 const* const gravity, int const fps) {
         const int substeps = 3;
-        ::io::my_mkdir( "tmp", 755 );
+        ::io::my_mkdir("tmp");
         cv::Mat opt(rgbs.at(0).clone()), in(rgbs.at(0).clone());
         std::vector<cv::Mat> movie;
         std::vector<cv::Scalar> colors;

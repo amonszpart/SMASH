@@ -52,7 +52,7 @@ int tracking::bundle_physics::BundleWithPhysics::animateCuboids2(
     BundleWithPhysicsResult       &         out,
     CuboidsT                 const&         cuboids,
     GroupedTracks2d          const&         tracks2d,
-    LinRgbsT                 const&         rgbs,
+    //LinRgbsT                 const&         rgbs,
     FrameIdsT                const&         frameIds,
     Mapper                   const&         mapper,
     Weights                  const&         weights,
@@ -433,6 +433,7 @@ ceres::Solver::Options tracking::bundle_physics::BundleWithPhysics::getSolverOpt
 //        options.minimizer_progress_to_stdout = weights.doVis;
     options.minimizer_progress_to_stdout = true;
     options.max_num_iterations           = 4000;
+    options.num_threads                  = 16;
     //options.max_solver_time_in_seconds   = 30;
     options.function_tolerance           = 1.e-12; // 16
     options.parameter_tolerance          = 1.e-12; // 16
@@ -468,6 +469,7 @@ auto tracking::bundle_physics::BundleWithPhysics::solve(
     if (!(weights.solveFlags & Weights::NO_SOLVE)) {
         // ================== SOLVE 1 ================== //
         if (weights.solveStages & Weights::SOLVE_MOMENTA) {
+            std::cout << __FILE__ << ":" << __LINE__ << " solving without impulse terms...\n";
             ceres::Solve(options, &problem, &summary);
             if (weights.doVis) {
                 cout << summary.FullReport() << "\n";
@@ -493,8 +495,19 @@ auto tracking::bundle_physics::BundleWithPhysics::solve(
         problem.SetParameterBlockVariable(indexer.getParabolaFreeParams(objA, getPartIdAfter(collId)));
         problem.SetParameterBlockVariable(indexer.getParabolaFreeParams(objB, getPartIdBefore(collId)));
         problem.SetParameterBlockVariable(indexer.getParabolaFreeParams(objB, getPartIdAfter(collId)));
-        if (weights.solveStages & Weights::SOLVE_MOMENTA)
+        if (weights.solveStages & Weights::SOLVE_MOMENTA) {
+            std::cout << __FILE__ << ":" << __LINE__ << " fixing mass...\n";
             problem.SetParameterBlockConstant(indexer.getMass(objB));
+        }
+
+//        std::cout << __FILE__ << ":" << __LINE__ << " limiting momenta..\n";
+//        for (PartId partId = 0; partId != 1; ++partId)
+//            for (int dim = 0; dim != 3; ++dim) {
+//                problem.SetParameterLowerBound(indexer.getMomentum(objA, partId), dim, -.2);
+//                problem.SetParameterLowerBound(indexer.getMomentum(objB, partId), dim, -.2);
+//                problem.SetParameterUpperBound(indexer.getMomentum(objA, partId), dim,  .2);
+//                problem.SetParameterUpperBound(indexer.getMomentum(objB, partId), dim,  .2);
+//            }
 
         std::cout << "adding impulse terms" << std::endl;
         addImpulseTerms(problem, indexer, costFunctors, frameIds, weights, cuboids, participants, consts);
@@ -503,8 +516,10 @@ auto tracking::bundle_physics::BundleWithPhysics::solve(
         poseLoss->Reset(new ceres::ScaledLoss(NULL, 10., ceres::TAKE_OWNERSHIP), ceres::TAKE_OWNERSHIP);
 
         // ================== SOLVE 2 ================== //
-        if (weights.solveStages & tracking::bundle_physics::Weights::SOLVE_COUPLED)
+        if (weights.solveStages & tracking::bundle_physics::Weights::SOLVE_COUPLED) {
+            std::cout << __FILE__ << ":" << __LINE__ << " solving with impulse terms...\n";
             ceres::Solve(options, &problem, &summary);
+        }
 
         out.getLog().log(summary, indexer, collId, participants);
 //        out.energies.push_back( summary.final_cost );
@@ -516,6 +531,7 @@ auto tracking::bundle_physics::BundleWithPhysics::solve(
 
         // ================== SOLVE 3 ==================
         if (weights.solveStages & tracking::bundle_physics::Weights::SOLVE_FREE_CP) {
+            std::cout << __FILE__ << ":" << __LINE__ << " solving free collision point...\n";
             ceres::Solve(options, &problem, &summary);
         }
         out.getLog().log(summary, indexer, collId, participants);

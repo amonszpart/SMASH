@@ -3,12 +3,13 @@ cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14 -Wextra -Wall")
 
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
+#LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" )
 
 # OpenCV
 SET(OpenCV_HINTS_DIR "/home/bontius/workspace/3rdparty/opencv/install/share/OpenCV")
-list(APPEND CMAKE_MODULE_PATH "${OpenCV_HINTS_DIR}")
-SET(OpenCV_DIR ${OpenCV_HINTS_DIR})
+IF (EXISTS ${OpenCV_HINTS_DIR})
+    SET(OpenCV_DIR ${OpenCV_HINTS_DIR})
+ENDIF()
 
 # Eigen
 FIND_PACKAGE( Eigen3 REQUIRED)

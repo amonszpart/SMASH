@@ -12,24 +12,21 @@ namespace tracking {
 
 int parseMapper(Mapper& mapper, int argc, const char** argv) {
     int ret = EXIT_SUCCESS;
-    Mapper::INTRINSICS intrinsicsName( Mapper::INTRINSICS::KINECT_ARON );
+    Mapper::INTRINSICS intrinsicsName(Mapper::INTRINSICS::IPHONE6_BLENDER);
     std::string intrinsicsString;
-    if ( console::parse_arg( argc,argv,"--intr",intrinsicsString ) )
-    {
-        if ( intrinsicsString.find(".") != std::string::npos )
-        {
-            std::ifstream fin( intrinsicsString );
-            if ( !fin.is_open() )
-            {
+    if (console::parse_arg(argc,argv,"--intr",intrinsicsString)) {
+        if (intrinsicsString.find(".") != std::string::npos) {
+            std::ifstream fin(intrinsicsString);
+            if (!fin.is_open()) {
                 std::cerr << "Could not open " << intrinsicsString << std::endl;
                 return EXIT_FAILURE;
             }
-            Mapper::Matrix3 intr( Mapper::Matrix3::Identity() );
+            Mapper::Matrix3 intr(Mapper::Matrix3::Identity());
             for (int row = 0; row != 3; ++row)
                 for (int col = 0; col != 3; ++col)
                     fin >> intr(row, col);
-            mapper = Mapper( intr );
-            std::cout << "parsed intrinsics:\n" << mapper.getIntrinsics() << std::endl;
+            mapper = Mapper(intr);
+            std::cout << __FILE__ << ":" << __LINE__ << " Parsed intrinsics:\n" << mapper.getIntrinsics() << std::endl;
             return EXIT_SUCCESS;
         }
         else if ( intrinsicsString.compare("kinect-aron") == 0 )
@@ -69,7 +66,7 @@ int parseMapper(Mapper& mapper, int argc, const char** argv) {
         ret = EXIT_FAILURE;
     }
 
-    mapper = Mapper( intrinsicsName );
+    mapper = Mapper(intrinsicsName);
     return ret;
 } //...parseMapper()
 

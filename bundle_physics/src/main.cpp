@@ -195,9 +195,10 @@ int main(int argc, const char *argv[]) {
     }
 
     // intrinsics
-    tracking::Mapper mapper(tracking::Mapper::DSLR_NILOY);
+    tracking::Mapper mapper(tracking::Mapper::IPHONE6_BLENDER);
     if (EXIT_SUCCESS != tracking::parseMapper(mapper, argc, argv)) {
-        std::cerr << "need to specify intrinsics with --intr" << std::endl;
+        std::cerr << "[" <<  __FILE__ << ":" << __LINE__ << "] "
+                  << "Need to specify intrinsics with --intr" << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -277,8 +278,11 @@ int main(int argc, const char *argv[]) {
     }
 
     if (!console::parse_arg(argc, argv, "--integral-steps", weights.poseIntegralSteps)) {
-        std::cerr << "[" << __func__ << "] " << "Need flag --integral-steps (0.5..2) for safety reasons..." << std::endl;
-        return EXIT_FAILURE;
+        //std::cerr << "[" << ____ << "] " << "Need flag --integral-steps (0.5..2) for safety reasons..." << std::endl;
+        std::cerr << "[" << __FILE__ << ":" << __LINE__ << "] "
+                  << "Assuming inntegral steps: " << weights.poseIntegralSteps
+                  << ", change with flag --integral-steps (0.5..4)" << std::endl;
+        //return EXIT_FAILURE;
     }
 
     // tracks
@@ -371,25 +375,6 @@ int main(int argc, const char *argv[]) {
         weights.bounds.collTime.upper = static_cast<double>(getNext(frameIds.at(1))) + (weights.fps / 60. - 1.);
     }
 
-    // --2dParabolas
-//    bool useParabola2dTerm = console::find_switch(argc,argv,"--para2d");
-//    if (useParabola2dTerm)
-//        std::cout << "[" << __func__ << "] " << "use parabola2dTerm: " << std::boolalpha << useParabola2dTerm << std::endl;
-
-    // Curtain1: momenta
-    if (0) {
-        initial.momenta[1][0] = { 0.0660085,  0.0333842 , 0.217801};
-        initial.momenta[1][1] = { -0.0228626,  -0.148693,   0.107043};
-        // duck:
-        initial.momenta[0][0] = { 0.01, 0.01, -0.0332678 };
-        initial.momenta[0][1] = { 0.0316294,   0.12934, 0.0676543 }; // looked veryvery good  0.0316294   0.12934 0.0676543
-
-        weights.initFlags |= Weights::USE_INPUT_MOMENTUM;
-//        weights.fixFlags |= Weights::FIX_MOMENTA;
-//        initial.mass = 0.393/0.237;
-//        weights.initFlags |= Weights::USE_INPUT_MASS;
-    }
-
     // run
     using namespace tracking::bundle_physics;
     BundleWithPhysicsResult result;
@@ -402,11 +387,12 @@ int main(int argc, const char *argv[]) {
         if (hasInfMass)
             ret = infMass(result, cuboids, tracks2d, rgbs, frameIds, mapper, weights, &initial, showFlags);
         else {
-            bool useParabola2dTerm = console::find_switch(argc, argv, "--para2d");
+//            bool useParabola2dTerm = console::find_switch(argc, argv, "--para2d");
+            bool useParabola2dTerm = true;
             if (useParabola2dTerm)
                 std::cout << "[" << __func__ << "] " << "use parabola2dTerm: " << std::boolalpha << useParabola2dTerm
                           << std::endl;
-            ret = BundleWithPhysics::animateCuboids2(result, cuboids, tracks2d, rgbs,
+            ret = BundleWithPhysics::animateCuboids2(result, cuboids, tracks2d, /*rgbs,*/
                                                      frameIds, mapper, weights, &initial,
                                                      useParabola2dTerm, showFlags);
         }

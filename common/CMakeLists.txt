@@ -5,7 +5,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14")
 
 # OpenCV
 MESSAGE(STATUS OpenCV_HINTS_DIR ${OpenCV_HINTS_DIR})
-FIND_PACKAGE(OpenCV REQUIRED viz imgproc highgui core
+FIND_PACKAGE(OpenCV REQUIRED imgproc highgui core
     HINTS ${OpenCV_HINTS_DIR})
 INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
 
@@ -54,7 +54,7 @@ set(HEADERS
     include/tracking/common/maths/quaternion.h
     include/tracking/common/trackPoint2d.h
     include/tracking/common/util/eigenUtil.h
-    include/tracking/common/io/cloudIo.h
+    #include/tracking/common/io/cloudIo.h
     include/tracking/common/util/prettyPrint.h
     include/tracking/common/io/flowIo.h
     include/tracking/common/macros.inl
@@ -107,7 +107,7 @@ set(SOURCES
     src/io/pgm.cpp
     src/io/depthIo.cpp
     src/io/savePly.cpp
-    src/io/cloudIo.cpp
+    #src/io/cloudIo.cpp
     src/io/flowIo/flowIO.cpp
     src/maths/geometry.cpp
     src/pointCloudEigen.cpp
@@ -129,6 +129,7 @@ set(${PROJECT_NAME}_INCLUDE_DIRS
     ${PROJECT_SOURCE_DIR}/include
     CACHE INTERNAL "${PROJECT_NAME}: Include Directories" FORCE)
 
+set_target_properties(common PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../lib)
 
 ################### TEST
 #find_package(GTest REQUIRED)
