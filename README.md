@@ -32,7 +32,7 @@ The code was developed and tested on *Ubuntu 16.04 LTS* with *gcc 6.2*.
 
 ### Installation
 ```bash
-git clone git@github.com:amonszpart/SMASH.git
+git clone https://github.com/amonszpart/SMASH
 cd SMASH
 mkdir build && cd build
 cmake [-DOpenCV_DIR=<path/to/opencv/share/OpenCV>]..
