@@ -4,7 +4,18 @@ Venue: [SIGGRAPH Asia 2016](https://sa2016.siggraph.org) <br />
 Authors: [Aron Monszpart](http://geometry.cs.ucl.ac.uk/amonszpart)<sup>1</sup>, [Nils Thuerey](http://ntoken.com)<sup>2</sup>, [Niloy J. Mitra](http://geometry.cs.ucl.ac.uk)<sup>1</sup><br />
 <sup>1</sup>University College London <sup>2</sup> Techincal University of Munich
 
+![Teaser](img/teaser.png)
+Starting from an input video of a collision sequence behind a curtain (top), SMASH reconstructs an accurate physically valid collision (bottom) using laws of rigid body physics for regularization. Note the reconstructed spin (_i.e._, angular velocity) of the objects.
+
+Videos: [Project](https://www.youtube.com/watch?v=rCZ-1yWJP2Q), [Fast forward](https://www.youtube.com/watch?v=rCZ-1yWJP2Q) <br />
+
+## Abstract
+Collision sequences are commonly used in games and entertainment to add drama and excitement. Authoring even two body collisions in the real world can be difficult, as one has to get timing and the object trajectories to be correctly synchronized. After tedious trial-and-error iterations, when objects can actually be made to collide, then they are difficult to capture in 3D. In contrast, synthetically generating plausible collisions is difficult as it requires adjusting different collision parameters (_e.g._, object mass ratio, coefficient of restitution, _etc._) and appropriate initial parameters. We present SMASH to directly read off appropriate collision parameters directly from raw input video recordings. Technically we enable this by utilizing laws of rigid body collision to regularize the problem of lifting 2D trajectories to a physically valid 3D reconstruction of the collision. The reconstructed sequences can then be modified and combined to easily author novel and plausible collisions. We evaluate our system on a range of synthetic scenes and demonstrate the effectiveness of our method by accurately reconstructing several complex real world collision events.
+
+
 ---
+
+## This repository
 
 ### Dependencies
 ##### Eigen <small>([link](http://eigen.tuxfamily.org/index.php?title=Main_Page))</small>
@@ -32,7 +43,7 @@ The code was developed and tested on *Ubuntu 16.04 LTS* with *gcc 6.2*.
 
 ### Installation
 ```bash
-git clone https://github.com/amonszpart/SMASH
+git clone git@github.com:amonszpart/SMASH.git
 cd SMASH
 mkdir build && cd build
 cmake [-DOpenCV_DIR=<path/to/opencv/share/OpenCV>]..
